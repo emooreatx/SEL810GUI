@@ -37,11 +37,11 @@ class Toggle(pygame.sprite.Sprite):
     def settoggle(self, value):
         self.togglevalue = value
         self.image.fill(WHITE)
-        if self.togglevalue == 1:
+        if self.togglevalue == 2: #down
             pygame.draw.polygon(self.image, BLACK, [(15, 5), (0, 30), (30, 30)])
-        if self.togglevalue == 0:
+        if self.togglevalue == 0: #up
             pygame.draw.polygon(self.image, BLACK, [(15, 25), (0, 0), (30, 0)])
-        if self.togglevalue == 2:
+        if self.togglevalue == 1: # neutral
             pygame.draw.polygon(self.image, BLACK, [(15, 10), (10, 15), (15, 20)])
 
 class Lamp(pygame.sprite.Sprite):
@@ -60,7 +60,7 @@ class Lamp(pygame.sprite.Sprite):
             pygame.draw.rect(self.image, (230, 224, 200), (0, 0, XLAMP, YLAMP))
        
 def main():
-    global SELPANEL, toggle, toggles, lamplist, lamps, t_hltclr
+    global SELPANEL, toggles, lamplist, lamps, t_hltclr
 
     pygame.init()
     SELPANEL = pygame.display.set_mode((XPANELSIZE,YPANELSIZE))
@@ -84,12 +84,25 @@ def main():
                     pos = pygame.mouse.get_pos()
                     clicked_toggle = [s for s in toggles if s.rect.collidepoint(pos)]
                     if len(clicked_toggle) > 0:
-                        if clicked_toggle[0].togglevalue == 0:
-                            print("was", clicked_toggle[0].togglevalue,"now 1")
-                            clicked_toggle[0].settoggle(1)
-                        elif clicked_toggle[0].togglevalue == 1:
-                            print("was", clicked_toggle[0].togglevalue,"now 0")
-                            clicked_toggle[0].settoggle(0)
+                        height = clicked_toggle[0].rect.bottom - clicked_toggle[0].rect.top
+                        top = clicked_toggle[0].rect.y
+                        print("height",height,"top",top,"clicked",pos[1])
+                        if(pos[1] <= top + (height/2)):
+                            if clicked_toggle[0].togglevalue == 1:
+                                print("was", clicked_toggle[0].togglevalue," flipping up")
+                                clicked_toggle[0].settoggle(0)
+                            elif clicked_toggle[0].togglevalue == 2:
+                                print("was", clicked_toggle[0].togglevalue,"flipping up")
+                                clicked_toggle[0].settoggle(1)
+                        else:
+                            if clicked_toggle[0].togglevalue == 0:
+                                print("was", clicked_toggle[0].togglevalue,"flipping down")
+                                clicked_toggle[0].settoggle(1)
+                            elif clicked_toggle[0].togglevalue == 1:
+                                print("was", clicked_toggle[0].togglevalue,"flipping down")
+                                clicked_toggle[0].settoggle(2)
+                        
+                        
                         
     except KeyboardInterrupt:
         sys.exit()
