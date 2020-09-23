@@ -33,7 +33,7 @@ BEIGE       = (227, 224, 200)
 LAMP_COUNT      = 85     # Number of lamps
 
 class Toggle(pygame.sprite.Sprite):
-
+    togglevalue = 0
     # Constructor. Pass in the color of the block,
     # and its x and y position
     def __init__(self):
@@ -47,12 +47,13 @@ class Toggle(pygame.sprite.Sprite):
         self.image.set_colorkey(WHITE)
         self.rect = self.image.get_rect()
     def settoggle(self, value):
+        self.togglevalue = value
         self.image.fill(WHITE)
-        if value == 1:
+        if self.togglevalue == 1:
             pygame.draw.polygon(self.image, BLACK, [(15, 5), (0, 30), (30, 30)])
-        if value == 0:
+        if self.togglevalue == 0:
             pygame.draw.polygon(self.image, BLACK, [(15, 25), (0, 0), (30, 0)])
-        if value == 2:
+        if self.togglevalue == 2:
             pygame.draw.polygon(self.image, BLACK, [(15, 10), (10, 15), (15, 20)])
 
 class Lamp(pygame.sprite.Sprite):
@@ -99,6 +100,17 @@ def main():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
+    # handle MOUSEBUTTONUP
+                if event.type == pygame.MOUSEBUTTONUP:
+                    pos = pygame.mouse.get_pos()
+                    clicked_toggle = [s for s in toggles if s.rect.collidepoint(pos)]
+                    if clicked_toggle[0].togglevalue == 0:
+                        clicked_toggle[0].settoggle(1)
+                        print("was 0 now 1")
+                    elif clicked_toggle[0].togglevalue == 1:
+                        clicked_toggle[0].settoggle(0)
+                        print("was", clicked_toggle[0].togglevalue,"now 0")
+                    
     except KeyboardInterrupt:
         sys.exit()
 
@@ -128,7 +140,6 @@ def draw_display(paneldict):
     panel = pygame.transform.scale(panel, (XPANELSIZE,YPANELSIZE))
     SELPANEL.blit(panel, (0, 0))
     print(paneldict["Program Counter"])
-    t_hltclr.settoggle(1)
 
 #TODO add parity and interupt
     if(paneldict["halt"]):
