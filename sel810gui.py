@@ -129,14 +129,41 @@ def draw_display(paneldict):
     SELPANEL.blit(panel, (0, 0))
     print(paneldict["Program Counter"])
     t_hltclr.settoggle(1)
-    lamplist[0][0].setlamp(1) #HALT
-    for bit in range(0,15):
-        print("BIT",bit,"MASK",MASKS[bit],"VAL",paneldict["Program Counter"] & MASKS[bit])
+
+#TODO add parity and interupt
+    if(paneldict["halt"]):
+        lamplist[0][0].setlamp(1)
+    if paneldict["iowait"] :
+        lamplist[2][0].setlamp(1)
+    if paneldict["overflow"]:
+        lamplist[4][0].setlamp(1)
+    
+    for bit in range(0,16):
         if(paneldict["Program Counter"] & MASKS[bit]):
             lamplist[0][16-bit].setlamp(1)
         else:
             lamplist[0][16-bit].setlamp(0)
-    
+
+        if(paneldict["Instruction"] & MASKS[bit]):
+            lamplist[1][16-bit].setlamp(1)
+        else:
+            lamplist[1][16-bit].setlamp(0) 
+            
+        if(paneldict["A Register"] & MASKS[bit]):
+            lamplist[2][16-bit].setlamp(1)
+        else:
+            lamplist[2][16-bit].setlamp(0)
+            
+        if(paneldict["B Register"] & MASKS[bit]):
+            lamplist[3][16-bit].setlamp(1)
+        else:
+            lamplist[3][16-bit].setlamp(0)
+#TODO: need T register
+        if(43690 & MASKS[bit]):
+            lamplist[4][16-bit].setlamp(1)
+        else:
+            lamplist[4][16-bit].setlamp(0)
+            
     toggles.draw(SELPANEL)
     lamps.draw(SELPANEL)
     pygame.display.update()
