@@ -239,31 +239,33 @@ def inittoggles():
     toggles.add(t_bacc)
           
 def togglehandler(clicked_toggle):
-    global tregister, globalpaneldict, a
+#    global tregister, globalpaneldict, a
+    updatedict = {}
     if(clicked_toggle.name == "hltclr"):
         tregister = 0
+        updatedict.update({"Transfer Register":0})
+        a.update_panel(updatedict)
     elif("trans" in clicked_toggle.name):
         number = int(clicked_toggle.name.lstrip("trans"))
-        if not(tregister & MASKS[15-number]):
-            tregister = tregister + MASKS[15-number]
+        if not(globalpaneldict["Transfer Register"] & MASKS[15-number]):
+            tregister = globalpaneldict["Transfer Register"] + MASKS[15-number]
+            updatedict.update({"Transfer Register":tregister})
+            a.update_panel(updatedict)
     elif(clicked_toggle.name == "mstrclr"):
         tregister = 0
-        globalpaneldict["Program Counter"] = 0
-        globalpaneldict["Instruction"] = 0
-        globalpaneldict["A Register"] = 0
-        globalpaneldict["B Register"] = 0
-        globalpaneldict["halt"] = True
-        a.update_panel(globalpaneldict)
+        updatedict.update({"master_clear":True})
+        a.update_panel(updatedict)
     elif(clicked_toggle.name == "strtstop"):
         if globalpaneldict["halt"] == True:
 #            a.starttog()
-            globalpaneldict["halt"] = False
+            updatedict.update({"halt":False})
         else:
-            a.halt()
+            updatedict.update({"halt":True})
 #            globalpaneldict["halt"] = True
-        a.update_panel(globalpaneldict)
+        a.update_panel(updatedict)
     elif(clicked_toggle.name == "step"):
-        a.step()
+        updatedict.update({"step":True})
+        a.update_panel(updatedict)
     elif(clicked_toggle.name == "iorelease"):
         tregister = 0
 #???
@@ -271,26 +273,28 @@ def togglehandler(clicked_toggle):
         tregister = 0
 #???
     elif(clicked_toggle.name == "memdisp"):
-        tregister = 0
+        updatedict.update({"display":True})
+        a.update_panel(updatedict)
 #???        
     elif(clicked_toggle.name == "mementer"):
-        tregister = 0
+        updatedict.update({"enter":True})
+        a.update_panel(updatedict)
 #????
     elif(clicked_toggle.name == "memstep"):
-        globalpaneldict["Program Counter"] = globalpaneldict["Program Counter"] + 1
-        a.update_panel(globalpaneldict)
+        updatedict.update({"Program Counter":globalpaneldict["Program Counter"] + 1})
+        a.update_panel(updatedict)
     elif(clicked_toggle.name == "setpc"):
-        globalpaneldict["Program Counter"] = tregister
-        a.update_panel(globalpaneldict)
+        updatedict.update({"Program Counter":globalpaneldict["Transfer Register"]})
+        a.update_panel(updatedict)
     elif(clicked_toggle.name == "instr"):
-        globalpaneldict["Instruction"] = tregister
-        a.update_panel(globalpaneldict)
+        updatedict.update({"Instruction":globalpaneldict["Transfer Register"]})
+        a.update_panel(updatedict)
     elif(clicked_toggle.name == "aacc"):
-        globalpaneldict["A Register"] = tregister
-        a.update_panel(globalpaneldict)
+        updatedict.update({"A Register":globalpaneldict["Transfer Register"]})
+        a.update_panel(updatedict)
     elif(clicked_toggle.name == "bacc"):
-        globalpaneldict["B Register"] = tregister
-        a.update_panel(globalpaneldict)
+        updatedict.update({"B Register":globalpaneldict["Transfer Register"]})
+        a.update_panel(updatedict)
     
     
 
@@ -317,15 +321,11 @@ def draw_display(paneldict):
         lamplist[4][0].setlamp(1)
     
     for bit in range(0,16):     
-        for register in ((0, "Program Counter"), (1, "Instruction"), (2, "A Register"), (3, "B Register")):
+        for register in ((0, "Program Counter"), (1, "Instruction"), (2, "A Register"), (3, "B Register"), (4, "Transfer Register")):
             if(paneldict[register[1]] & MASKS[bit]):
                 lamplist[register[0]][16-bit].setlamp(1)
             else:
-                lamplist[register[0]][16-bit].setlamp(0)
-        if(tregister & MASKS[bit]): #T Register
-            lamplist[4][16-bit].setlamp(1)
-        else:
-            lamplist[4][16-bit].setlamp(0)      
+                lamplist[register[0]][16-bit].setlamp(0)     
     toggles.draw(SELPANEL)
     lamps.draw(SELPANEL)
     pygame.display.update()
